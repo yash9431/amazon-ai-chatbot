@@ -9,13 +9,13 @@ function requireEnv(name, fallback) {
 }
 
 export const config = {
-  env: process.env.NODE_ENV || "development",
+  env: process.env.NODE_ENV,
   port: Number(requireEnv("PORT", 5174)),
 
   openaiApiKey: process.env.OPENAI_API_KEY || "",
   
-  rainforestApiKey: process.env.RAINFOREST_API_KEY || "",
-  productsProvider: process.env.PRODUCTS_PROVIDER || "rainforest",
+  rainforestApiKey: process.env.RAINFOREST_API_KEY,
+  productsProvider: process.env.PRODUCTS_PROVIDER,
 
   corsOrigin: process.env.CORS_ORIGIN || "http://localhost:5173",
 };

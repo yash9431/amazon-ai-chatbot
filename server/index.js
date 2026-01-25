@@ -8,33 +8,14 @@ import { config } from "./utils/config.js";
 import { searchProducts } from "./services/rainforest.js";
 import { summarizeWithOpenAI } from "./services/openai.js";
 
-
+//Extracts search preferences from user queries then gives a sorted product list
 function parseFiltersFromMessage(message) {
   const m = String(message || "").toLowerCase();
-
   const out = {};
 
-  // price: "under $50", "below 30", "less than 100"
-  const priceMatch =
-    m.match(/under\s*\$?\s*(\d{1,5})/) ||
-    m.match(/below\s*\$?\s*(\d{1,5})/) ||
-    m.match(/less\s+than\s*\$?\s*(\d{1,5})/);
-  if (priceMatch) out.maxPrice = Number(priceMatch[1]);
-
-  // rating: "4 stars", "4.5 star", "at least 4 stars"
-  const ratingMatch =
-    m.match(/at\s+least\s*(\d(?:\.\d)?)\s*stars?/) ||
-    m.match(/(\d(?:\.\d)?)\s*stars?\s+and\s+up/) ||
-    m.match(/(\d(?:\.\d)?)\s*stars?/);
-  if (ratingMatch) out.minRating = Number(ratingMatch[1]);
-
-  // prime only
-  if (m.includes("prime only") || m.includes("prime-only") || m.includes("with prime")) out.prime = true;
-
-  // sort preference
-  if (m.includes("best rated") || m.includes("highest rated")) out.sort = "rating";
-  if (m.includes("cheapest") || m.includes("lowest price")) out.sort = "price_asc";
-  if (m.includes("most expensive")) out.sort = "price_desc";
+  if (m.includes("best rated") || m.includes("highest rated")) out.sort_by = "featured"; // or whatever Rainforest supports
+  if (m.includes("cheapest") || m.includes("lowest price")) out.sort_by = "price_low_to_high";
+  if (m.includes("most expensive")) out.sort_by = "price_high_to_low";
 
   return out;
 }
@@ -67,15 +48,6 @@ app.get("/health", (_req, res) => {
       openaiConfigured: Boolean(config.openaiApiKey),
       rainforestConfigured: Boolean(config.rainforestApiKey),
     },
-  });
-});
-
-app.get("/compliance", (_req, res) => {
-  res.json({
-    affiliateNotice:
-      "As an Amazon Associate I earn from qualifying purchases. Product data provided by Amazon.",
-    priceDisclaimer:
-      "Prices/availability accurate at time of query and may change.",
   });
 });
 

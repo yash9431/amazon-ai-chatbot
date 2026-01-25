@@ -1,3 +1,4 @@
+//this is optional
 import OpenAI from "openai";
 
 const PRODUCT_WHITELIST = [
@@ -32,18 +33,16 @@ export async function summarizeWithOpenAI(products, history, apiKey) {
 
   const client = new OpenAI({ apiKey });
 
-  const system = `
-You are a shopping assistant. ONLY use provided product fields.
-If a field is missing, say you don't know. Do not invent prices or ratings.
-Be helpful.`;
-
   const completion = await client.chat.completions.create({
     model: "gpt-4o-mini",
     temperature: 0.2,
     messages: [
-      { role: "system", content: system.trim() },
-      { role: "user", content: lastUser },
-      { role: "system", content: safe.length ? JSON.stringify(safe, null, 2) : "No products found." },
+      {
+        role: "system",
+        //Telling the system how to respond to the user based on the provided product data  
+        content: "Summarize the provided product list for the user's query. Use only the provided fields. If a field is missing, state that it is unavailable. Do not invent prices, ratings, or availability.",
+      },
+      { role: "user", content: JSON.stringify(input) },
     ],
   });
 
